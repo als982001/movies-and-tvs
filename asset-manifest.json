@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/movies-and-tvs/static/js/main.8e981cc2.js",
+    "index.html": "/movies-and-tvs/index.html",
+    "main.8e981cc2.js.map": "/movies-and-tvs/static/js/main.8e981cc2.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.8e981cc2.js"
+  ]
+}
