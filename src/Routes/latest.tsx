@@ -1,4 +1,5 @@
 import { useQuery } from "react-query";
+import styled from "styled-components";
 import { getLatestMovie, getLatestTv, ILatestMovie, ILatestTv } from "../api";
 import {
   LatestMedia,
@@ -9,6 +10,34 @@ import {
   Wrapper,
 } from "../Components/Styles/mediaStyles";
 import { makeImagePath } from "../utils";
+
+const Title = styled.p`
+  font-size: 35px;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
+const Overview = styled.p`
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 10px;
+`;
+
+const Genres = styled.section`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+`;
+
+const OtherInfo = styled.p`
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
+const Genre = styled.span``;
+
 export default function Latest() {
   const { data: latestMovie, isLoading: latestMovieLoading } =
     useQuery<ILatestMovie>("latestMove", getLatestMovie);
@@ -20,7 +49,6 @@ export default function Latest() {
   return (
     <Wrapper
       style={{
-        backgroundColor: "green",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -30,7 +58,6 @@ export default function Latest() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <p>{latestMovie.backdrop_path}</p>
           <LatestMedia style={{ marginTop: "100px" }}>
             {latestMovie.backdrop_path ? (
               <LatestMediaPoster
@@ -40,28 +67,61 @@ export default function Latest() {
               <LatestNoPoster>No Poster</LatestNoPoster>
             )}
             <LatestMediaInfos>
-              <p style={{ fontSize: "35px", fontWeight: "bold" }}>
-                {latestMovie.title}
-              </p>
-              <p>
+              <Title>{latestMovie.title}</Title>
+              <Overview>
                 {latestMovie.overview
                   ? latestMovie.overview.length > 100
                     ? latestMovie.overview.slice(0, 100) + "..."
                     : latestMovie.overview
                   : "No Overview"}
-              </p>
-              {latestMovie.genres.length === 0 ? (
-                <p>No Genre Info</p>
-              ) : (
-                latestMovie.genres.map((genre) => <p>{genre.name}</p>)
-              )}
-              <p>{latestMovie.status}</p>
-              <p>{latestMovie.original_language}</p>
-              <p>{latestMovie.popularity}</p>
-              <p>{latestMovie.vote_average}</p>
+              </Overview>
+              <Genres>
+                {latestMovie.genres.length === 0 ? (
+                  <p>No Genre Info</p>
+                ) : (
+                  latestMovie.genres.map((genre) => (
+                    <Genre>{`✺ ${genre.name} `}</Genre>
+                  ))
+                )}
+              </Genres>
+              <OtherInfo>{`Status: ${latestMovie.status}`}</OtherInfo>
+              <OtherInfo>{`Laugnage: ${latestMovie.original_language}`}</OtherInfo>
+              <OtherInfo>{`Popularity: ${latestMovie.popularity}`}</OtherInfo>
+              <OtherInfo>{`Vote Average: ${latestMovie.vote_average}`}</OtherInfo>
             </LatestMediaInfos>
           </LatestMedia>
-          <LatestMedia></LatestMedia>
+          <LatestMedia>
+            {latestTv.backdrop_path ? (
+              <LatestMediaPoster
+                bgphoto={makeImagePath(latestTv.backdrop_path)}
+              ></LatestMediaPoster>
+            ) : (
+              <LatestNoPoster>No Poster</LatestNoPoster>
+            )}
+            <LatestMediaInfos>
+              <Title>{latestTv.name}</Title>
+              <Overview>
+                {latestTv.overview
+                  ? latestTv.overview.length > 100
+                    ? latestTv.overview.slice(0, 100) + "..."
+                    : latestTv.overview
+                  : "No Overview"}
+              </Overview>
+              <Genres>
+                {latestTv.genres.length === 0 ? (
+                  <p>No Genre Info</p>
+                ) : (
+                  latestTv.genres.map((genre) => (
+                    <Genre>{`✺ ${genre.name} `}</Genre>
+                  ))
+                )}
+              </Genres>
+              <OtherInfo>{`Status: ${latestTv.status}`}</OtherInfo>
+              <OtherInfo>{`Laugnage: ${latestTv.original_language}`}</OtherInfo>
+              <OtherInfo>{`Popularity: ${latestTv.popularity}`}</OtherInfo>
+              <OtherInfo>{`Vote Average: ${latestTv.vote_average}`}</OtherInfo>
+            </LatestMediaInfos>
+          </LatestMedia>
         </>
       )}
     </Wrapper>

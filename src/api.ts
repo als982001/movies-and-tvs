@@ -107,8 +107,9 @@ export interface ILatestTv {
     poster_path: string | null;
     season_number: number;
   }[];
+  status: string;
   type: string;
-  votea_average: number;
+  vote_average: number;
   vote_count: number;
 }
 

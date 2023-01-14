@@ -334,7 +334,7 @@ export const LatestMedia = styled.section`
   width: 80vw;
   height: 80vh;
   border-radius: 50px;
-  background-color: yellow;
+  background-color: #282a3a;
   margin-bottom: 100px;
   overflow: hidden;
   display: flex;
@@ -367,7 +367,7 @@ export const LatestMediaPoster = styled.section<{ bgphoto: string }>`
 export const LatestMediaInfos = styled.section`
   width: 25%;
   height: 90%;
-  background-color: #13005a;
+  background-color: #d8d8d8;
   border-radius: 20px;
   margin-left: 10px;
   display: flex;
@@ -375,4 +375,5 @@ export const LatestMediaInfos = styled.section`
   align-items: center;
   justify-content: center;
   padding: 10px;
+  color: #182747;
 `;
