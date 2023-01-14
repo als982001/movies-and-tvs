@@ -5,6 +5,7 @@ import Search from "./Routes/Search";
 import Tvs from "./Routes/Tvs/tvs";
 import Movies from "./Routes/Movies/movies";
 import Popular from "./Routes/Popular";
+import Latest from "./Routes/latest";
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
         </Route>
         <Route path={["/movies", "/movies/:movieId"]}>
           <Movies />
+        </Route>
+        <Route path="/latest">
+          <Latest />
         </Route>
         <Route path="/">
           <Home />

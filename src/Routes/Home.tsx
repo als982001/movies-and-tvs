@@ -15,34 +15,34 @@ function Home() {
         style={{
           alignItems: "end",
           marginTop: "50px",
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(https://pbs.twimg.com/media/Fjh8aw-VQAAmTGK?format=jpg&name=4096x4096)`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(https://cdn.pixabay.com/photo/2020/12/28/20/45/frozen-lake-5868472_1280.jpg)`,
         }}
       >
         <Introduction style={{ marginRight: "50px" }}>
           <IntroductionTitle>영화, TV 정보를 한눈에!</IntroductionTitle>
           <IntroductionOverview style={{ height: "80vh" }}>
-            星をめざして　何処までだって行こ　ワクワクを追いかけて
-            じっとして居られないのは　本能的なものだ
-            ほら　知れば知るほどに　ときめきが止まらない
-            わたしがいつの日にか　星になれたなら　いいのに
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum
+            ut pretium metus. Suspendisse potenti. Phasellus eu hendrerit metus.
+            Maecenas fermentum ante auctor ligula tincidunt sagittis. Morbi
+            aliquet metus vel augue porttitor cursus sit amet vitae libero. Ut
+            blandit pharetra augue id vestibulum.
           </IntroductionOverview>
         </Introduction>
       </Poster>
       <Poster
         style={{
           alignItems: "start",
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(https://pbs.twimg.com/media/Fey14s-UoAAzR-Y?format=jpg&name=4096x4096)`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(https://cdn.pixabay.com/photo/2022/12/30/10/47/typewriter-7686633_1280.jpg)`,
         }}
       >
         <Introduction style={{ marginLeft: "50px" }}>
           <IntroductionTitle>영화 확인하기</IntroductionTitle>
           <IntroductionOverview style={{ height: "100vh" }}>
-            立ち止まった　ふいに交差点で 読み返すキミのメッセージ
-            すれ違う光も　さっきからスローモーション
-            見惚れる　切り取った絵画みたいなトキ
-            こんなにも　暖かい気持ちあっただなんて 初めての私になっていく
-            あの日から　少しずつ キミの心を明るくする
-            小さな灯(あか)りになれたらいいな
+            Ut suscipit, nisi non eleifend bibendum, purus erat pulvinar augue,
+            convallis efficitur massa leo molestie purus. Curabitur nec mauris
+            ullamcorper, vulputate turpis nec, tristique neque. Praesent
+            euismod, erat quis tincidunt maximus, nisi elit aliquet risus, non
+            ultricies nisl purus et ex. Aliquam non est risus.
           </IntroductionOverview>
           <PageBtn>
             <Link to="/movies">Movie</Link>
@@ -52,18 +52,16 @@ function Home() {
       <Poster
         style={{
           alignItems: "end",
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),url(https://pbs.twimg.com/media/FagsAfMUYAEvm7Q?format=jpg&name=4096x4096)`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),url(https://cdn.pixabay.com/photo/2022/12/28/21/10/night-7683839_1280.jpg)`,
         }}
       >
         <Introduction style={{ marginRight: "50px" }}>
           <IntroductionTitle>TV 확인하기</IntroductionTitle>
           <IntroductionOverview style={{ height: "100vh" }}>
-            おしえて 僕は何処へ向かえばいい? ずっと探していた
-            大切な何かを（ほら!） いつか失くしてしまうものばかりなら
-            強く刻んでおこう（今!） 惨めな夜もバカ笑いも
-            あのね、その後が言えなかった日も （あいむあらいぶなういえ
-            すぷりんぐたいむおぶらいふ） 嗚り止まなくてなにが悪い
-            青春でなにが悪い
+            Morbi a mollis nibh. Pellentesque felis libero, sodales finibus
+            augue sit amet, consequat lacinia ante. Duis in ligula vel purus
+            facilisis viverra. Sed rutrum lacus a mauris molestie, eu pharetra
+            est eleifend. Cras eget purus ac quam fringilla congue.
           </IntroductionOverview>
           <PageBtn>
             <Link to="/tvs">Tv</Link>

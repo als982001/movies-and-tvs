@@ -27,6 +27,7 @@ import {
   Box,
   DisplayStand,
   Loader,
+  NoData,
   Overlay,
   Row,
   SimilarMovie,
@@ -260,6 +261,7 @@ export default function Popular() {
                             titleLength={
                               clickedMovie.title.length || clickedTv.name.length
                             }
+                            style={{ fontWeight: "bold" }}
                           >
                             {clickedMovie.title || clickedTv.name}
                           </BigMediaTitle>
@@ -308,19 +310,9 @@ export default function Popular() {
                           <p>아직은 보여줄 수 없다</p>
                         ) : (
                           <>
-                            {clickedMediaType === "movie"
-                              ? similarMovies.results
-                                ? similarMovies.results
-                                    .slice(0, 6)
-                                    .map((s) => (
-                                      <SimilarMovie
-                                        key={s.id}
-                                        bgphoto={makeImagePath(s.backdrop_path)}
-                                      />
-                                    ))
-                                : null
-                              : similarTvs.results
-                              ? similarTvs.results
+                            {clickedMediaType === "movie" ? (
+                              similarMovies.results ? (
+                                similarMovies.results
                                   .slice(0, 6)
                                   .map((s) => (
                                     <SimilarMovie
@@ -328,7 +320,21 @@ export default function Popular() {
                                       bgphoto={makeImagePath(s.backdrop_path)}
                                     />
                                   ))
-                              : null}
+                              ) : (
+                                <NoData>No Data</NoData>
+                              )
+                            ) : similarTvs.results ? (
+                              similarTvs.results
+                                .slice(0, 6)
+                                .map((s) => (
+                                  <SimilarMovie
+                                    key={s.id}
+                                    bgphoto={makeImagePath(s.backdrop_path)}
+                                  />
+                                ))
+                            ) : (
+                              <NoData>No Data</NoData>
+                            )}
                           </>
                         )}
                       </SimilarMovies>

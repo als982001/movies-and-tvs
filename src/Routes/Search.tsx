@@ -65,6 +65,8 @@ function Search() {
   const [similar, setSimilar] = useState<IGetMovieResult | IGetTvResult>();
   const [similarLoading, setSimilarLoading] = useState(true);
 
+  const { scrollY } = useViewportScroll();
+
   const location = useLocation();
   const keyword = new URLSearchParams(location.search).get("keyword");
 
@@ -134,7 +136,7 @@ function Search() {
             <>
               <Overlay onClick={onOverlayClick} />
               <BigMovie
-                style={{ top: 20 }}
+                style={{ top: scrollY.get() + 20 }}
                 layoutId={`${clickedMedia.id}_${clickedMedia.media_type}`}
               >
                 <>

@@ -32,7 +32,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build",
-    "predeploy": "npm run build"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "redeploy": "nom run build"
   },
   "eslintConfig": {
     "extends": [
@@ -57,5 +59,5 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.26"
   },
-  "homepage": "https://als982001.github.io/react-movies"
+  "homepage": "https://als982001.github.io/movies-and-tvs"
 }

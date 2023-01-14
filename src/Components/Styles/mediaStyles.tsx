@@ -234,6 +234,7 @@ export const BigMovie = styled(motion.div)`
   right: 0;
   margin: 0 auto;
   border-radius: 15px;
+  border: 1px solid #f8ede3;
   overflow: hidden;
   background-color: ${(props) => props.theme.black.lighter};
   display: flex;
@@ -292,6 +293,7 @@ export const SimilarMovies = styled.section`
   height: 60%;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
+  position: relative;
 `;
 
 export const SimilarTitle = styled.h2`
@@ -317,4 +319,60 @@ export const BigMediaTitle = styled.h1<{ titleLength: number }>`
 export const Video = styled.iframe`
   width: 100vw;
   height: 70vh;
+`;
+
+export const NoData = styled.h2`
+  font-size: 60px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+export const LatestMedia = styled.section`
+  width: 80vw;
+  height: 80vh;
+  border-radius: 50px;
+  background-color: yellow;
+  margin-bottom: 100px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const LatestNoPoster = styled.section`
+  width: 65%;
+  height: 90%;
+  background-color: #1a120b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  font-size: 100px;
+  font-weight: bold;
+`;
+
+export const LatestMediaPoster = styled.section<{ bgphoto: string }>`
+  width: 65%;
+  height: 90%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgphoto});
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+`;
+
+export const LatestMediaInfos = styled.section`
+  width: 25%;
+  height: 90%;
+  background-color: #13005a;
+  border-radius: 20px;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 `;
