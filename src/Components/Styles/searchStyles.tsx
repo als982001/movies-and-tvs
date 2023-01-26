@@ -19,7 +19,7 @@ export const Results = styled.div`
   flex-direction: column;
   margin: 0 auto;
   width: 80vw;
-\  display: grid;
+  display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 `;

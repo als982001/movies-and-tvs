@@ -41,7 +41,7 @@ export const Overview = styled.p`
 export const Slider = styled.div`
   position: relative;
   top: -100px;
-  margin-bottom: 300px;
+  margin-bottom: 100px;
 `;
 
 export const Row = styled(motion.div)`
@@ -53,6 +53,12 @@ export const Row = styled(motion.div)`
   left: 0px;
   right: 0px;
   margin: 0 auto;
+`;
+
+export const Display = styled.section`
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
 `;
 
 export const Box = styled(motion.div)<{ bgphoto: string }>`
@@ -92,7 +98,7 @@ export const AddIndexBtn = styled.div`
   position: absolute;
   right: 20px;
   top: 270px;
-  z-index: 5;
+  z-index: 100;
   display: flex;
   width: 60px;
   height: 60px;
@@ -113,7 +119,7 @@ export const SubtractIndexBtn = styled.div`
   position: absolute;
   left: 20px;
   top: 270px;
-  z-index: 5;
+  z-index: 100;
   display: flex;
   width: 60px;
   height: 60px;

@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { AnimatePresence, useViewportScroll } from "framer-motion";
+import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
   getOnAirTvs,
@@ -22,6 +22,7 @@ import {
   BigOtherInfos,
   BigSentenceInfos,
   Box,
+  Display,
   DisplayStand,
   Info,
   InfoBtn,
@@ -53,6 +54,7 @@ import {
 } from "../../Components/Variants/mediaVariants";
 import { tvGenres, getTvGenre } from "../../Components/genres";
 import { useHistory, useRouteMatch } from "react-router-dom";
+import styled from "styled-components";
 
 const offset = 6;
 
@@ -71,6 +73,51 @@ const emptyTv: ITv = {
   name: "",
   original_name: "",
 };
+
+export const TBox = styled(motion.div)<{ bgphoto: string }>`
+  background-color: white;
+  background-image: url(${(props) => props.bgphoto});
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+  border-radius: 20px;
+
+  box-shadow: 3px 3px 2px 1px #d8d8d8, -3px 3px 2px 1px #d8d8d8;
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
+  cursor: pointer;
+`;
+
+export const TInfos = styled(motion.section)`
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 35%;
+  bottom: 0;
+  border-radius: 0 0 20px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+`;
+
+export const TInfo = styled.div`
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-radius: 20%;
+  font-weight: bold;
+  span {
+    font-size: 10px;
+  }
+`;
 
 export default function Tvs() {
   const [clickedTv, setClickedTv] = useState<ITv>(emptyTv);
@@ -92,24 +139,6 @@ export default function Tvs() {
     ["tvs", "topRated"],
     getTopRatedTvs
   );
-
-  const [onAirIndex, setOnAirIndex] = useState(0);
-  const changeOnAirIndex = (plusIndex: boolean) => {
-    if (onAir) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalTvs = onAir.results.length - 1;
-      const maxIndex = Math.floor(totalTvs / offset) - 1;
-
-      if (plusIndex === true) {
-        setOnAirIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setOnAirIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
 
   const [airingTodayIndex, setAiringTodayIndex] = useState(0);
   const changeAiringTodayIndex = (plusIndex: boolean) => {
@@ -203,28 +232,15 @@ export default function Tvs() {
             <Slider>
               <StandTitles>
                 <StandTitle>On Air</StandTitle>
-                <AddIndexBtn onClick={() => changeOnAirIndex(true)}>
-                  ≫
-                </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeOnAirIndex(false)}>
-                  ≪
-                </SubtractIndexBtn>
               </StandTitles>
-              <DisplayStand>
+              <div>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                  <Row
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ type: "tween", duration: 1 }}
-                    key={onAirIndex}
-                  >
+                  <Display>
                     {onAir.results
                       .slice(1)
-                      .slice(offset * onAirIndex, offset * onAirIndex + offset)
+                      .slice(0, 18)
                       .map((tv) => (
-                        <Box
+                        <TBox
                           layoutId={tv.id + "onAir"}
                           key={tv.id}
                           variants={boxVariants}
@@ -234,155 +250,104 @@ export default function Tvs() {
                           bgphoto={makeImagePath(tv.backdrop_path)}
                           onClick={() => onBoxClicked("onAir", tv.id)}
                         >
-                          <Info variants={infoVariants}>
-                            <InfoBtns>
-                              <InfoLeftBtns>
-                                <InfoBtn>▶</InfoBtn>
-                                <InfoBtn>+</InfoBtn>
-                                <InfoBtn>👍🏻</InfoBtn>
-                              </InfoLeftBtns>
-                              <InfoBtn>∨</InfoBtn>
-                            </InfoBtns>
-                            <InfoSentences>
-                              <InfoTitle>{tv.name}</InfoTitle>
-                              <InfoGenres>
-                                {tv.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>{`● ${getTvGenre(
-                                    genreId
-                                  )}`}</InfoGenre>
-                                ))}
-                              </InfoGenres>
-                            </InfoSentences>
-                          </Info>
-                        </Box>
+                          <TInfos variants={infoVariants}>
+                            <TInfo
+                              style={{
+                                width: "50%",
+                                fontSize: "15px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {tv.name}
+                            </TInfo>
+                            <TInfo style={{ width: "30%" }}>
+                              <span>{`🏳️: ${tv.origin_country}`}</span>
+                              <span>{`Score: ${tv.popularity}`}</span>
+                            </TInfo>
+                          </TInfos>
+                        </TBox>
                       ))}
-                  </Row>
+                  </Display>
                 </AnimatePresence>
-              </DisplayStand>
+              </div>
             </Slider>
-            <Slider style={{ marginTop: "500px" }}>
+            <Slider>
               <StandTitles>
                 <StandTitle>Airing Today</StandTitle>
-                <AddIndexBtn onClick={() => changeAiringTodayIndex(true)}>
-                  ≫
-                </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeAiringTodayIndex(false)}>
-                  ≪
-                </SubtractIndexBtn>
               </StandTitles>
-              <DisplayStand>
+              <div>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                  <Row
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ type: "tween", duration: 1 }}
-                    key={airingTodayIndex}
-                  >
-                    {airingToday.results
-                      .slice(
-                        offset * airingTodayIndex,
-                        offset * airingTodayIndex + offset
-                      )
-                      .map((tv) => (
-                        <Box
-                          layoutId={tv.id + "airingToday"}
-                          key={tv.id}
-                          variants={boxVariants}
-                          initial="normal"
-                          whileHover="hover"
-                          transition={{ type: "tween" }}
-                          bgphoto={makeImagePath(tv.backdrop_path)}
-                          onClick={() => onBoxClicked("airingToday", tv.id)}
-                        >
-                          <Info variants={infoVariants}>
-                            <InfoBtns>
-                              <InfoLeftBtns>
-                                <InfoBtn>▶</InfoBtn>
-                                <InfoBtn>+</InfoBtn>
-                                <InfoBtn>👍🏻</InfoBtn>
-                              </InfoLeftBtns>
-                              <InfoBtn>∨</InfoBtn>
-                            </InfoBtns>
-                            <InfoSentences>
-                              <InfoTitle>{tv.name}</InfoTitle>
-                              <InfoGenres>
-                                {tv.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>{`● ${getTvGenre(
-                                    genreId
-                                  )}`}</InfoGenre>
-                                ))}
-                              </InfoGenres>
-                            </InfoSentences>
-                          </Info>
-                        </Box>
-                      ))}
-                  </Row>
+                  <Display>
+                    {airingToday.results.slice(0, 18).map((tv) => (
+                      <TBox
+                        layoutId={tv.id + "airingToday"}
+                        key={tv.id}
+                        variants={boxVariants}
+                        initial="normal"
+                        whileHover="hover"
+                        transition={{ type: "tween" }}
+                        bgphoto={makeImagePath(tv.backdrop_path)}
+                        onClick={() => onBoxClicked("airingToday", tv.id)}
+                      >
+                        <TInfos variants={infoVariants}>
+                          <TInfo
+                            style={{
+                              width: "50%",
+                              fontSize: "15px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {tv.name}
+                          </TInfo>
+                          <TInfo style={{ width: "30%" }}>
+                            <span>{`🏳️: ${tv.origin_country}`}</span>
+                            <span>{`Score: ${tv.popularity}`}</span>
+                          </TInfo>
+                        </TInfos>
+                      </TBox>
+                    ))}
+                  </Display>
                 </AnimatePresence>
-              </DisplayStand>
+              </div>
             </Slider>
-            <Slider style={{ marginTop: "500px" }}>
+            <Slider>
               <StandTitles>
                 <StandTitle>Top Rated</StandTitle>
-                <AddIndexBtn onClick={() => changeTopRatedIndex(true)}>
-                  ≫
-                </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeTopRatedIndex(false)}>
-                  ≪
-                </SubtractIndexBtn>
               </StandTitles>
-              <DisplayStand>
+              <div>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                  <Row
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ type: "tween", duration: 1 }}
-                    key={topRatedIndex}
-                  >
-                    {topRated.results
-                      .slice(
-                        offset * topRatedIndex,
-                        offset * topRatedIndex + offset
-                      )
-                      .map((tv) => (
-                        <Box
-                          layoutId={tv.id + "topRated"}
-                          key={tv.id}
-                          variants={boxVariants}
-                          initial="normal"
-                          whileHover="hover"
-                          transition={{ type: "tween" }}
-                          bgphoto={makeImagePath(tv.backdrop_path)}
-                          onClick={() => onBoxClicked("topRated", tv.id)}
-                        >
-                          <Info variants={infoVariants}>
-                            <InfoBtns>
-                              <InfoLeftBtns>
-                                <InfoBtn>▶</InfoBtn>
-                                <InfoBtn>+</InfoBtn>
-                                <InfoBtn>👍🏻</InfoBtn>
-                              </InfoLeftBtns>
-                              <InfoBtn>∨</InfoBtn>
-                            </InfoBtns>
-                            <InfoSentences>
-                              <InfoTitle>{tv.name}</InfoTitle>
-                              <InfoGenres>
-                                {tv.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>{`● ${getTvGenre(
-                                    genreId
-                                  )}`}</InfoGenre>
-                                ))}
-                              </InfoGenres>
-                            </InfoSentences>
-                          </Info>
-                        </Box>
-                      ))}
-                  </Row>
+                  <Display>
+                    {topRated.results.slice(0, 18).map((tv) => (
+                      <TBox
+                        layoutId={tv.id + "topRated"}
+                        key={tv.id}
+                        variants={boxVariants}
+                        initial="normal"
+                        whileHover="hover"
+                        transition={{ type: "tween" }}
+                        bgphoto={makeImagePath(tv.backdrop_path)}
+                        onClick={() => onBoxClicked("topRated", tv.id)}
+                      >
+                        <TInfos variants={infoVariants}>
+                          <TInfo
+                            style={{
+                              width: "50%",
+                              fontSize: "15px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {tv.name}
+                          </TInfo>
+                          <TInfo style={{ width: "30%" }}>
+                            <span>{`🏳️: ${tv.origin_country}`}</span>
+                            <span>{`Score: ${tv.popularity}`}</span>
+                          </TInfo>
+                        </TInfos>
+                      </TBox>
+                    ))}
+                  </Display>
                 </AnimatePresence>
-              </DisplayStand>
+              </div>
             </Slider>
             {bigTvMatch ? (
               <>

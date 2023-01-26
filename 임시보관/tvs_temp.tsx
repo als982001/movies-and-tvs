@@ -1,15 +1,14 @@
 import { useQuery } from "react-query";
 import { AnimatePresence, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useHistory, useRouteMatch } from "react-router-dom";
 import {
+  getOnAirTvs,
+  getTopRatedTvs,
+  ITv,
+  IGetTvResult,
+  getPopularTvs,
   API_KEY,
-  getNowPlayingMovies,
-  getTopRatedMovies,
-  getUpcomingMovies,
-  IGetMovieResult,
-  IMovie,
-  emptyMovie,
+  getAiringTodayTvs,
 } from "../../api";
 import {
   AddIndexBtn,
@@ -50,90 +49,82 @@ import { makeImagePath } from "../../utils";
 import {
   boxVariants,
   infoVariants,
+  rowVariants,
 } from "../../Components/Variants/mediaVariants";
-import { getMovieGenre } from "../../Components/genres";
-import { click } from "@testing-library/user-event/dist/click";
+import { tvGenres, getTvGenre } from "../../Components/genres";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 const offset = 6;
-let addIndex = false;
 
-const rowVariants = {
-  hidden: (addIndex: boolean) => ({
-    // x: addIndex ? -window.outerWidth - 5 : window.outerWidth + 5,
-    x: window.outerWidth + 5,
-  }),
-
-  /*   hidden: {
-    x: window.outerWidth + 5,
-    backgroundColor: addIndex ? "green" : "ivory",
-  }, */
-  visible: {
-    x: 0,
-  },
-  /*   exit: {
-    x: -window.outerWidth - 5,
-    backgroundColor: addIndex ? "blue" : "yellow",
-  }, */
-  exit: (addIndex: boolean) => {
-    return {
-      // x: addIndex ? window.outerWidth + 5 : -window.outerWidth - 5,
-      x: -window.outerWidth - 5,
-    };
-  },
+const emptyTv: ITv = {
+  poster_path: "",
+  popularity: 0,
+  id: 0,
+  backdrop_path: "",
+  vote_average: 0,
+  overview: "",
+  first_air_date: "",
+  origin_country: [""],
+  genre_ids: [0],
+  original_language: "",
+  vote_count: 0,
+  name: "",
+  original_name: "",
 };
 
-export default function Movies() {
-  const [clickedMovie, setClickedMovie] = useState<IMovie>(emptyMovie);
-  const [clickedMovieType, setClickedMovieType] = useState<string>("");
+export default function Tvs() {
+  const [clickedTv, setClickedTv] = useState<ITv>(emptyTv);
+  const [clickedTvType, setClickedTvType] = useState<string>("");
 
   const { scrollY } = useViewportScroll();
   const history = useHistory();
-
-  const [leaving, setLeaving] = useState(false);
   const toggleLeaving = () => setLeaving((prev) => !prev);
 
-  const { data: nowPlaying, isLoading: nowPlayingLoading } =
-    useQuery<IGetMovieResult>(["movies", "nowPlaying"], getNowPlayingMovies);
-  const { data: upcoming, isLoading: upcomingLoading } =
-    useQuery<IGetMovieResult>(["movies", "upcoming"], getUpcomingMovies);
-  const { data: topRated, isLoading: topRatedLoading } =
-    useQuery<IGetMovieResult>(["movies", "topRated"], getTopRatedMovies);
+  const [leaving, setLeaving] = useState(false);
 
-  const [nowPlayingIndex, setNowPlayingIndex] = useState(0);
-  const changeNowPlayingIndex = (plusIndex: boolean) => {
-    if (nowPlaying) {
+  const { data: onAir, isLoading: onAirLoading } = useQuery<IGetTvResult>(
+    ["tvs", "onAir"],
+    getOnAirTvs
+  );
+  const { data: airingToday, isLoading: airingTodayLoading } =
+    useQuery<IGetTvResult>(["tvs", "airingToday"], getAiringTodayTvs);
+  const { data: topRated, isLoading: topRatedLoading } = useQuery<IGetTvResult>(
+    ["tvs", "topRated"],
+    getTopRatedTvs
+  );
+
+  const [onAirIndex, setOnAirIndex] = useState(0);
+  const changeOnAirIndex = (plusIndex: boolean) => {
+    if (onAir) {
       if (leaving) return;
-
-      addIndex = plusIndex;
-      console.log(addIndex);
 
       toggleLeaving();
 
-      const totalMovies = nowPlaying.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const totalTvs = onAir.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
 
       if (plusIndex === true) {
-        setNowPlayingIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+        setOnAirIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
       } else {
-        setNowPlayingIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+        setOnAirIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
       }
     }
   };
 
-  const [upcomingIndex, setUpcomingIndex] = useState(0);
-  const changeUpcomingIndex = (plusIndex: boolean) => {
-    if (upcoming) {
+  const [airingTodayIndex, setAiringTodayIndex] = useState(0);
+  const changeAiringTodayIndex = (plusIndex: boolean) => {
+    if (airingToday) {
       if (leaving) return;
 
       toggleLeaving();
 
-      const totalMovies = upcoming.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const totalTvs = airingToday.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
 
       if (plusIndex === true) {
-        setUpcomingIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+        setAiringTodayIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
       } else {
-        setUpcomingIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+        setAiringTodayIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
       }
     }
   };
@@ -156,66 +147,66 @@ export default function Movies() {
     }
   };
 
-  const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
+  const bigTvMatch = useRouteMatch<{ tvId: string }>("/tvs/:tvId");
 
   const onOverlayClick = () => {
-    setClickedMovie(emptyMovie);
-    setClickedMovieType("");
+    setClickedTv((prev) => emptyTv);
+    setClickedTvType((prev) => "");
     setSimilarLoading((prev) => true);
-    history.push("/movies");
+    history.push("/tvs");
   };
-  const onBoxClicked = (type: string, movieId: number) => {
-    let result = emptyMovie;
+  const onBoxClicked = (type: string, tvId: number) => {
+    let result = emptyTv;
 
-    if (type === "nowPlaying") {
-      result = nowPlaying.results.find((movie) => movie.id === movieId);
-    } else if (type === "upcoming") {
-      result = upcoming.results.find((movie) => movie.id === movieId);
+    if (type === "onAir") {
+      result = onAir.results.find((tv) => tv.id === tvId);
+    } else if (type === "airingToday") {
+      result = airingToday.results.find((tv) => tv.id === tvId);
     } else if (type === "topRated") {
-      result = topRated.results.find((movie) => movie.id === movieId);
+      result = topRated.results.find((tv) => tv.id === tvId);
     }
-    setClickedMovie(result);
-    setClickedMovieType(type);
 
-    history.push(`/movies/${movieId}`);
+    setClickedTv(result);
+    setClickedTvType(type);
+
+    history.push(`/tvs/${tvId}`);
   };
 
-  const [similar, setSimilar] = useState<IGetMovieResult>();
+  const [similar, setSimilar] = useState<IGetTvResult>();
   const [similarLoading, setSimilarLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      if (clickedMovie) {
+      if (clickedTv) {
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${clickedMovie.id}/similar?api_key=${API_KEY}`
+          `https://api.themoviedb.org/3/tv/${clickedTv.id}/similar?api_key=${API_KEY}`
         );
         const json = await response.json();
+
         setSimilar(json);
         setSimilarLoading((prev) => false);
       }
     })();
-  }, [clickedMovie]);
+  }, [clickedTv]);
 
   return (
     <Wrapper>
-      {nowPlayingLoading || upcomingLoading || topRatedLoading ? (
+      {onAirLoading || airingTodayLoading || topRatedLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            bgphoto={makeImagePath(nowPlaying.results[0].backdrop_path || "")}
-          >
-            <Title>{nowPlaying.results[0].title}</Title>
-            <Overview>{nowPlaying.results[0].overview}</Overview>
+          <Banner bgphoto={makeImagePath(onAir.results[0].backdrop_path || "")}>
+            <Title>{onAir.results[0].name}</Title>
+            <Overview>{onAir.results[0].overview}</Overview>
           </Banner>
           <>
             <Slider>
               <StandTitles>
-                <StandTitle>Now Playing</StandTitle>
-                <AddIndexBtn onClick={() => changeNowPlayingIndex(true)}>
+                <StandTitle>On Air</StandTitle>
+                <AddIndexBtn onClick={() => changeOnAirIndex(true)}>
                   ≫
                 </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeNowPlayingIndex(false)}>
+                <SubtractIndexBtn onClick={() => changeOnAirIndex(false)}>
                   ≪
                 </SubtractIndexBtn>
               </StandTitles>
@@ -227,25 +218,21 @@ export default function Movies() {
                     animate="visible"
                     exit="exit"
                     transition={{ type: "tween", duration: 1 }}
-                    key={nowPlayingIndex}
-                    custom={addIndex}
+                    key={onAirIndex}
                   >
-                    {nowPlaying.results
+                    {onAir.results
                       .slice(1)
-                      .slice(
-                        offset * nowPlayingIndex,
-                        offset * nowPlayingIndex + offset
-                      )
-                      .map((movie) => (
+                      .slice(offset * onAirIndex, offset * onAirIndex + offset)
+                      .map((tv) => (
                         <Box
-                          layoutId={movie.id + "nowPlaying"}
-                          key={movie.id}
+                          layoutId={tv.id + "onAir"}
+                          key={tv.id}
                           variants={boxVariants}
                           initial="normal"
                           whileHover="hover"
                           transition={{ type: "tween" }}
-                          bgphoto={makeImagePath(movie.backdrop_path)}
-                          onClick={() => onBoxClicked("nowPlaying", movie.id)}
+                          bgphoto={makeImagePath(tv.backdrop_path)}
+                          onClick={() => onBoxClicked("onAir", tv.id)}
                         >
                           <Info variants={infoVariants}>
                             <InfoBtns>
@@ -257,12 +244,12 @@ export default function Movies() {
                               <InfoBtn>∨</InfoBtn>
                             </InfoBtns>
                             <InfoSentences>
-                              <InfoTitle>{movie.title}</InfoTitle>
+                              <InfoTitle>{tv.name}</InfoTitle>
                               <InfoGenres>
-                                {movie.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>
-                                    {`● ${getMovieGenre(genreId)}`}
-                                  </InfoGenre>
+                                {tv.genre_ids.slice(0, 3).map((genreId) => (
+                                  <InfoGenre key={genreId}>{`● ${getTvGenre(
+                                    genreId
+                                  )}`}</InfoGenre>
                                 ))}
                               </InfoGenres>
                             </InfoSentences>
@@ -275,11 +262,11 @@ export default function Movies() {
             </Slider>
             <Slider style={{ marginTop: "500px" }}>
               <StandTitles>
-                <StandTitle>Upcoming</StandTitle>
-                <AddIndexBtn onClick={() => changeUpcomingIndex(true)}>
+                <StandTitle>Airing Today</StandTitle>
+                <AddIndexBtn onClick={() => changeAiringTodayIndex(true)}>
                   ≫
                 </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeUpcomingIndex(false)}>
+                <SubtractIndexBtn onClick={() => changeAiringTodayIndex(false)}>
                   ≪
                 </SubtractIndexBtn>
               </StandTitles>
@@ -291,23 +278,23 @@ export default function Movies() {
                     animate="visible"
                     exit="exit"
                     transition={{ type: "tween", duration: 1 }}
-                    key={upcomingIndex}
+                    key={airingTodayIndex}
                   >
-                    {upcoming.results
+                    {airingToday.results
                       .slice(
-                        offset * upcomingIndex,
-                        offset * upcomingIndex + offset
+                        offset * airingTodayIndex,
+                        offset * airingTodayIndex + offset
                       )
-                      .map((movie) => (
+                      .map((tv) => (
                         <Box
-                          layoutId={movie.id + "upcoming"}
-                          key={movie.id}
+                          layoutId={tv.id + "airingToday"}
+                          key={tv.id}
                           variants={boxVariants}
                           initial="normal"
                           whileHover="hover"
                           transition={{ type: "tween" }}
-                          bgphoto={makeImagePath(movie.backdrop_path)}
-                          onClick={() => onBoxClicked("upcoming", movie.id)}
+                          bgphoto={makeImagePath(tv.backdrop_path)}
+                          onClick={() => onBoxClicked("airingToday", tv.id)}
                         >
                           <Info variants={infoVariants}>
                             <InfoBtns>
@@ -319,12 +306,12 @@ export default function Movies() {
                               <InfoBtn>∨</InfoBtn>
                             </InfoBtns>
                             <InfoSentences>
-                              <InfoTitle>{movie.title}</InfoTitle>
+                              <InfoTitle>{tv.name}</InfoTitle>
                               <InfoGenres>
-                                {movie.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>
-                                    {`● ${getMovieGenre(genreId)}`}
-                                  </InfoGenre>
+                                {tv.genre_ids.slice(0, 3).map((genreId) => (
+                                  <InfoGenre key={genreId}>{`● ${getTvGenre(
+                                    genreId
+                                  )}`}</InfoGenre>
                                 ))}
                               </InfoGenres>
                             </InfoSentences>
@@ -360,16 +347,16 @@ export default function Movies() {
                         offset * topRatedIndex,
                         offset * topRatedIndex + offset
                       )
-                      .map((movie) => (
+                      .map((tv) => (
                         <Box
-                          layoutId={movie.id + "topRated"}
-                          key={movie.id}
+                          layoutId={tv.id + "topRated"}
+                          key={tv.id}
                           variants={boxVariants}
                           initial="normal"
                           whileHover="hover"
                           transition={{ type: "tween" }}
-                          bgphoto={makeImagePath(movie.backdrop_path)}
-                          onClick={() => onBoxClicked("topRated", movie.id)}
+                          bgphoto={makeImagePath(tv.backdrop_path)}
+                          onClick={() => onBoxClicked("topRated", tv.id)}
                         >
                           <Info variants={infoVariants}>
                             <InfoBtns>
@@ -381,12 +368,12 @@ export default function Movies() {
                               <InfoBtn>∨</InfoBtn>
                             </InfoBtns>
                             <InfoSentences>
-                              <InfoTitle>{movie.title}</InfoTitle>
+                              <InfoTitle>{tv.name}</InfoTitle>
                               <InfoGenres>
-                                {movie.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>
-                                    {`● ${getMovieGenre(genreId)}`}
-                                  </InfoGenre>
+                                {tv.genre_ids.slice(0, 3).map((genreId) => (
+                                  <InfoGenre key={genreId}>{`● ${getTvGenre(
+                                    genreId
+                                  )}`}</InfoGenre>
                                 ))}
                               </InfoGenres>
                             </InfoSentences>
@@ -397,19 +384,19 @@ export default function Movies() {
                 </AnimatePresence>
               </DisplayStand>
             </Slider>
-            {bigMovieMatch ? (
+            {bigTvMatch ? (
               <>
                 <Overlay onClick={onOverlayClick} />
                 <BigMovie
                   style={{ top: scrollY.get() + 20 }}
-                  layoutId={bigMovieMatch.params.movieId + clickedMovieType}
+                  layoutId={bigTvMatch.params.tvId + clickedTvType}
                 >
-                  {clickedMovie ? (
+                  {clickedTv ? (
                     <>
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedMovie.backdrop_path,
+                            clickedTv.backdrop_path,
                             "w500"
                           )})`,
                         }}
@@ -418,10 +405,10 @@ export default function Movies() {
                         <BigSentenceInfos>
                           <BigMainInfos>
                             <BigMediaTitle
-                              titleLength={clickedMovie.title.length}
+                              titleLength={clickedTv.name.length}
                               style={{ fontWeight: "bold" }}
                             >
-                              {clickedMovie.title}
+                              {clickedTv.name}
                             </BigMediaTitle>
                             <p
                               style={{
@@ -429,29 +416,31 @@ export default function Movies() {
                                 fontWeight: "300",
                               }}
                             >
-                              {clickedMovie.overview.length > 300
-                                ? clickedMovie.overview.slice(0, 300) + "..."
-                                : clickedMovie.overview}
+                              {clickedTv.overview
+                                ? clickedTv.overview.length > 500
+                                  ? clickedTv.overview.slice(0, 500) + "..."
+                                  : clickedTv.overview
+                                : "There is no overview."}
                             </p>
                           </BigMainInfos>
                           <BigOtherInfos>
-                            {clickedMovie.genre_ids.map((genreId) => (
+                            {clickedTv.genre_ids.map((genreId) => (
                               <BigOtherInfo key={genreId}>
-                                {`● ${getMovieGenre(genreId)}`}
+                                {`● ${getTvGenre(genreId)}`}
                               </BigOtherInfo>
                             ))}
                             <BigOtherInfo>
-                              {`Release Date: ${clickedMovie.release_date}`}
+                              {`First Air Date: ${clickedTv.first_air_date}`}
                             </BigOtherInfo>
                             <BigOtherInfo>
-                              {`Popularity: ${clickedMovie.popularity}`}
+                              {`Popularity: ${clickedTv.popularity}`}
                             </BigOtherInfo>
                             <BigOtherInfo>
-                              {`Vote Average: ${clickedMovie.vote_average}`}
+                              {`Vote Average: ${clickedTv.vote_average}`}
                             </BigOtherInfo>
                           </BigOtherInfos>
                         </BigSentenceInfos>
-                        <SimilarTitle>Similar Movies</SimilarTitle>
+                        <SimilarTitle>Similar Tvs</SimilarTitle>
                         <SimilarMovies>
                           {similarLoading ? (
                             <p>아직은 보여줄 수 없다</p>
@@ -463,7 +452,10 @@ export default function Movies() {
                                     .map((s) => (
                                       <SimilarMovie
                                         key={s.id}
-                                        bgphoto={makeImagePath(s.backdrop_path)}
+                                        bgphoto={makeImagePath(
+                                          s.backdrop_path,
+                                          "w500"
+                                        )}
                                       />
                                     ))
                                 : null}

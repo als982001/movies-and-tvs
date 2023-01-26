@@ -2,6 +2,7 @@ export const rowVariants = {
   /* hidden: (isBack: boolean) => ({
     x: isBack ? -window.outerWidth - 5 : window.outerWidth + 5,
   }), */
+
   hidden: {
     x: window.outerWidth + 5,
   },
