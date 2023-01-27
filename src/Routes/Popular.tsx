@@ -1,4 +1,5 @@
-import { AnimatePresence, useViewportScroll } from "framer-motion";
+import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
+import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -25,6 +26,7 @@ import {
   BigOtherInfos,
   BigSentenceInfos,
   Box,
+  Display,
   DisplayStand,
   Loader,
   NoData,
@@ -41,8 +43,57 @@ import {
 } from "../Components/Styles/mediaStyles";
 import { boxVariants, rowVariants } from "../Components/Variants/mediaVariants";
 import { makeImagePath } from "../utils";
+import { infoVariants } from "../Components/Styles/searchStyles";
 
-const offset = 6;
+export const TBox = styled(motion.div)<{ bgphoto: string }>`
+  background-color: white;
+  background-image: url(${(props) => props.bgphoto});
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+  border-radius: 20px;
+
+  box-shadow: 3px 3px 2px 1px #d8d8d8, -3px 3px 2px 1px #d8d8d8;
+  &:first-child,
+  &:nth-child(7),
+  &:nth-child(13) {
+    transform-origin: center left;
+  }
+
+  &:last-child,
+  &:nth-child(6),
+  &:nth-child(12) {
+    transform-origin: center right;
+  }
+  cursor: pointer;
+`;
+
+export const TInfos = styled(motion.section)`
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 35%;
+  bottom: 0;
+  border-radius: 0 0 20px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+`;
+
+export const TInfo = styled.div`
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-radius: 20%;
+  font-weight: bold;
+  span {
+    font-size: 10px;
+  }
+`;
 
 export default function Popular() {
   const [clickedMovie, setClickedMovie] = useState<IMovie>();
@@ -63,42 +114,6 @@ export default function Popular() {
     useQuery<IGetMovieResult>("popularMovies", getPopularMovies);
   const { data: popularTvs, isLoading: popularTvsLoading } =
     useQuery<IGetTvResult>("popularTvs", getPopularTvs);
-
-  const [moviesIndex, setMoviesIndex] = useState(0);
-  const changeMoviesIndex = (plusIndex: boolean) => {
-    if (popularMovies) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalMovies = popularMovies.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-
-      if (plusIndex) {
-        setMoviesIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setMoviesIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
-
-  const [tvsIndex, setTvsIndex] = useState(0);
-  const changeTvsIndex = (plusIndex: boolean) => {
-    if (popularTvs) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalTvs = popularTvs.results.length - 1;
-      const maxIndex = Math.floor(totalTvs / offset) - 1;
-
-      if (plusIndex) {
-        setTvsIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setTvsIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
 
   const bigMovieMatch = useRouteMatch<{ mediaId: string }>(
     "/popular/movie/:mediaId"
@@ -162,76 +177,80 @@ export default function Popular() {
           <Slider style={{ marginTop: "200px" }}>
             <StandTitles>
               <StandTitle>Popular Movies</StandTitle>
-              <AddIndexBtn onClick={() => changeMoviesIndex(true)}>
-                ≫
-              </AddIndexBtn>
-              <SubtractIndexBtn onClick={() => changeMoviesIndex(false)}>
-                ≪
-              </SubtractIndexBtn>
             </StandTitles>
-            <DisplayStand>
+            <div>
               <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                <Row
-                  variants={rowVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  transition={{ type: "tween", duration: 1 }}
-                  key={moviesIndex}
-                >
-                  {popularMovies.results
-                    .slice(offset * moviesIndex, offset * moviesIndex + offset)
-                    .map((movie) => (
-                      <Box
-                        layoutId={movie.id + ""}
-                        key={movie.id}
-                        variants={boxVariants}
-                        initial="normal"
-                        whileHover="hover"
-                        transition={{ type: "tween" }}
-                        bgphoto={makeImagePath(movie.backdrop_path, "w500")}
-                        onClick={() => onBoxClick("movie", movie.id)}
-                      ></Box>
-                    ))}
-                </Row>
+                <Display>
+                  {popularMovies.results.slice(0, 18).map((movie) => (
+                    <TBox
+                      layoutId={movie.id + ""}
+                      key={movie.id}
+                      variants={boxVariants}
+                      initial="normal"
+                      whileHover="hover"
+                      transition={{ type: "tween" }}
+                      bgphoto={makeImagePath(movie.backdrop_path, "w500")}
+                      onClick={() => onBoxClick("movie", movie.id)}
+                    >
+                      <TInfos variants={infoVariants}>
+                        <TInfo
+                          style={{
+                            width: "50%",
+                            fontSize: "15px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {movie.title}
+                        </TInfo>
+                        <TInfo style={{ width: "30%" }}>
+                          <span>{`🏳️: ${movie.original_language}`}</span>
+                          <span>{`Score: ${movie.popularity}`}</span>
+                        </TInfo>
+                      </TInfos>
+                    </TBox>
+                  ))}
+                </Display>
               </AnimatePresence>
-            </DisplayStand>
+            </div>
           </Slider>
-          <Slider style={{ marginTop: "500px" }}>
+          <Slider>
             <StandTitles>
               <StandTitle>Popular Tvs</StandTitle>
-              <AddIndexBtn onClick={() => changeTvsIndex(true)}>≫</AddIndexBtn>
-              <SubtractIndexBtn onClick={() => changeTvsIndex(false)}>
-                ≪
-              </SubtractIndexBtn>
             </StandTitles>
-            <DisplayStand>
+            <div>
               <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                <Row
-                  variants={rowVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  transition={{ type: "tween", duration: 1 }}
-                  key={tvsIndex}
-                >
-                  {popularTvs.results
-                    .slice(offset * tvsIndex, offset * tvsIndex + offset)
-                    .map((tv) => (
-                      <Box
-                        layoutId={tv.id + ""}
-                        key={tv.id}
-                        variants={boxVariants}
-                        initial="normal"
-                        whileHover="hover"
-                        transition={{ type: "tween" }}
-                        bgphoto={makeImagePath(tv.backdrop_path, "w500")}
-                        onClick={() => onBoxClick("tv", tv.id)}
-                      ></Box>
-                    ))}
-                </Row>
+                <Display>
+                  {popularTvs.results.slice(0, 18).map((tv) => (
+                    <TBox
+                      layoutId={tv.id + ""}
+                      key={tv.id}
+                      variants={boxVariants}
+                      initial="normal"
+                      whileHover="hover"
+                      transition={{ type: "tween" }}
+                      bgphoto={makeImagePath(tv.backdrop_path, "w500")}
+                      onClick={() => onBoxClick("tv", tv.id)}
+                    >
+                      <TInfos variants={infoVariants}>
+                        <TInfo
+                          style={{
+                            width: "50%",
+                            fontSize: "15px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {tv.name}
+                        </TInfo>
+                        <TInfo style={{ width: "30%" }}>
+                          <span>{`🏳️: ${tv.origin_country}`}</span>
+                          <span>{`Score: ${tv.popularity}`}</span>
+                        </TInfo>
+                      </TInfos>
+                    </TBox>
+                  ))}
+                </Display>
               </AnimatePresence>
-            </DisplayStand>
+            </div>
           </Slider>
           {bigMovieMatch || bigTvMatch ? (
             <>

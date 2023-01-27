@@ -1,7 +1,8 @@
 import { useQuery } from "react-query";
-import { AnimatePresence, useViewportScroll } from "framer-motion";
+import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
+import styled from "styled-components";
 import {
   API_KEY,
   getNowPlayingMovies,
@@ -23,6 +24,7 @@ import {
   BigOtherInfos,
   BigSentenceInfos,
   Box,
+  Display,
   DisplayStand,
   Info,
   InfoBtn,
@@ -52,35 +54,59 @@ import {
   infoVariants,
 } from "../../Components/Variants/mediaVariants";
 import { getMovieGenre } from "../../Components/genres";
-import { click } from "@testing-library/user-event/dist/click";
+import NowPlaying from "./nowPlaying";
+import TopRated from "./topRated";
+import Upcoming from "./upcoming";
 
-const offset = 6;
-let addIndex = false;
+export const TBox = styled(motion.div)<{ bgphoto: string }>`
+  background-color: white;
+  background-image: url(${(props) => props.bgphoto});
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+  border-radius: 20px;
 
-const rowVariants = {
-  hidden: (addIndex: boolean) => ({
-    // x: addIndex ? -window.outerWidth - 5 : window.outerWidth + 5,
-    x: window.outerWidth + 5,
-  }),
+  box-shadow: 3px 3px 2px 1px #d8d8d8, -3px 3px 2px 1px #d8d8d8;
+  &:first-child,
+  &:nth-child(7),
+  &:nth-child(13) {
+    transform-origin: center left;
+  }
 
-  /*   hidden: {
-    x: window.outerWidth + 5,
-    backgroundColor: addIndex ? "green" : "ivory",
-  }, */
-  visible: {
-    x: 0,
-  },
-  /*   exit: {
-    x: -window.outerWidth - 5,
-    backgroundColor: addIndex ? "blue" : "yellow",
-  }, */
-  exit: (addIndex: boolean) => {
-    return {
-      // x: addIndex ? window.outerWidth + 5 : -window.outerWidth - 5,
-      x: -window.outerWidth - 5,
-    };
-  },
-};
+  &:last-child,
+  &:nth-child(6),
+  &:nth-child(12) {
+    transform-origin: center right;
+  }
+  cursor: pointer;
+`;
+
+export const TInfos = styled(motion.section)`
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 35%;
+  bottom: 0;
+  border-radius: 0 0 20px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+`;
+
+export const TInfo = styled.div`
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-radius: 20%;
+  font-weight: bold;
+  span {
+    font-size: 10px;
+  }
+`;
 
 export default function Movies() {
   const [clickedMovie, setClickedMovie] = useState<IMovie>(emptyMovie);
@@ -89,72 +115,12 @@ export default function Movies() {
   const { scrollY } = useViewportScroll();
   const history = useHistory();
 
-  const [leaving, setLeaving] = useState(false);
-  const toggleLeaving = () => setLeaving((prev) => !prev);
-
   const { data: nowPlaying, isLoading: nowPlayingLoading } =
     useQuery<IGetMovieResult>(["movies", "nowPlaying"], getNowPlayingMovies);
   const { data: upcoming, isLoading: upcomingLoading } =
     useQuery<IGetMovieResult>(["movies", "upcoming"], getUpcomingMovies);
   const { data: topRated, isLoading: topRatedLoading } =
     useQuery<IGetMovieResult>(["movies", "topRated"], getTopRatedMovies);
-
-  const [nowPlayingIndex, setNowPlayingIndex] = useState(0);
-  const changeNowPlayingIndex = (plusIndex: boolean) => {
-    if (nowPlaying) {
-      if (leaving) return;
-
-      addIndex = plusIndex;
-      console.log(addIndex);
-
-      toggleLeaving();
-
-      const totalMovies = nowPlaying.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-
-      if (plusIndex === true) {
-        setNowPlayingIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setNowPlayingIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
-
-  const [upcomingIndex, setUpcomingIndex] = useState(0);
-  const changeUpcomingIndex = (plusIndex: boolean) => {
-    if (upcoming) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalMovies = upcoming.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-
-      if (plusIndex === true) {
-        setUpcomingIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setUpcomingIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
-
-  const [topRatedIndex, setTopRatedIndex] = useState(0);
-  const changeTopRatedIndex = (plusIndex: boolean) => {
-    if (topRated) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalMovies = topRated.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-
-      if (plusIndex === true) {
-        setTopRatedIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setTopRatedIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
 
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
 
@@ -209,97 +175,62 @@ export default function Movies() {
             <Overview>{nowPlaying.results[0].overview}</Overview>
           </Banner>
           <>
-            <Slider>
-              <StandTitles>
-                <StandTitle>Now Playing</StandTitle>
-                <AddIndexBtn onClick={() => changeNowPlayingIndex(true)}>
-                  ≫
-                </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeNowPlayingIndex(false)}>
-                  ≪
-                </SubtractIndexBtn>
-              </StandTitles>
-              <DisplayStand>
-                <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                  <Row
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ type: "tween", duration: 1 }}
-                    key={nowPlayingIndex}
-                    custom={addIndex}
-                  >
-                    {nowPlaying.results
-                      .slice(1)
-                      .slice(
-                        offset * nowPlayingIndex,
-                        offset * nowPlayingIndex + offset
-                      )
-                      .map((movie) => (
-                        <Box
-                          layoutId={movie.id + "nowPlaying"}
-                          key={movie.id}
-                          variants={boxVariants}
-                          initial="normal"
-                          whileHover="hover"
-                          transition={{ type: "tween" }}
-                          bgphoto={makeImagePath(movie.backdrop_path)}
-                          onClick={() => onBoxClicked("nowPlaying", movie.id)}
-                        >
-                          <Info variants={infoVariants}>
-                            <InfoBtns>
-                              <InfoLeftBtns>
-                                <InfoBtn>▶</InfoBtn>
-                                <InfoBtn>+</InfoBtn>
-                                <InfoBtn>👍🏻</InfoBtn>
-                              </InfoLeftBtns>
-                              <InfoBtn>∨</InfoBtn>
-                            </InfoBtns>
-                            <InfoSentences>
-                              <InfoTitle>{movie.title}</InfoTitle>
-                              <InfoGenres>
-                                {movie.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>
-                                    {`● ${getMovieGenre(genreId)}`}
-                                  </InfoGenre>
-                                ))}
-                              </InfoGenres>
-                            </InfoSentences>
-                          </Info>
-                        </Box>
-                      ))}
-                  </Row>
-                </AnimatePresence>
-              </DisplayStand>
-            </Slider>
-            <Slider style={{ marginTop: "500px" }}>
-              <StandTitles>
-                <StandTitle>Upcoming</StandTitle>
-                <AddIndexBtn onClick={() => changeUpcomingIndex(true)}>
-                  ≫
-                </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeUpcomingIndex(false)}>
-                  ≪
-                </SubtractIndexBtn>
-              </StandTitles>
-              <DisplayStand>
-                <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                  <Row
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ type: "tween", duration: 1 }}
-                    key={upcomingIndex}
-                  >
-                    {upcoming.results
-                      .slice(
-                        offset * upcomingIndex,
-                        offset * upcomingIndex + offset
-                      )
-                      .map((movie) => (
-                        <Box
+            <NowPlaying />
+            <Upcoming />
+            <TopRated />
+            <>
+              {/*  <Slider>
+                <StandTitles>
+                  <StandTitle>Now Playing</StandTitle>
+                </StandTitles>
+                <div>
+                  <AnimatePresence>
+                    <Display>
+                      {nowPlaying.results
+                        .slice(1)
+                        .slice(0, 18)
+                        .map((movie) => (
+                          <TBox
+                            layoutId={movie.id + "nowPlaying"}
+                            key={movie.id}
+                            variants={boxVariants}
+                            initial="normal"
+                            whileHover="hover"
+                            transition={{ type: "tween" }}
+                            bgphoto={makeImagePath(movie.backdrop_path)}
+                            onClick={() => onBoxClicked("nowPlaying", movie.id)}
+                          >
+                            <TInfos variants={infoVariants}>
+                              <TInfo
+                                style={{
+                                  width: "50%",
+                                  fontSize: "15px",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {movie.title}
+                              </TInfo>
+                              <TInfo style={{ width: "30%" }}>
+                                <span>{`🏳️: ${movie.original_language}`}</span>
+                                <span>{`Score: ${movie.popularity}`}</span>
+                              </TInfo>
+                            </TInfos>
+                          </TBox>
+                        ))}
+                    </Display>
+                  </AnimatePresence>
+                </div>
+              </Slider>
+
+              <Slider>
+                <StandTitles>
+                  <StandTitle>Upcoming</StandTitle>
+                </StandTitles>
+                <div>
+                  <AnimatePresence>
+                    <Display>
+                      {upcoming.results.slice(0, 18).map((movie) => (
+                        <TBox
                           layoutId={movie.id + "upcoming"}
                           key={movie.id}
                           variants={boxVariants}
@@ -309,59 +240,36 @@ export default function Movies() {
                           bgphoto={makeImagePath(movie.backdrop_path)}
                           onClick={() => onBoxClicked("upcoming", movie.id)}
                         >
-                          <Info variants={infoVariants}>
-                            <InfoBtns>
-                              <InfoLeftBtns>
-                                <InfoBtn>▶</InfoBtn>
-                                <InfoBtn>+</InfoBtn>
-                                <InfoBtn>👍🏻</InfoBtn>
-                              </InfoLeftBtns>
-                              <InfoBtn>∨</InfoBtn>
-                            </InfoBtns>
-                            <InfoSentences>
-                              <InfoTitle>{movie.title}</InfoTitle>
-                              <InfoGenres>
-                                {movie.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>
-                                    {`● ${getMovieGenre(genreId)}`}
-                                  </InfoGenre>
-                                ))}
-                              </InfoGenres>
-                            </InfoSentences>
-                          </Info>
-                        </Box>
+                          <TInfos variants={infoVariants}>
+                            <TInfo
+                              style={{
+                                width: "50%",
+                                fontSize: "15px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {movie.title}
+                            </TInfo>
+                            <TInfo style={{ width: "30%" }}>
+                              <span>{`🏳️: ${movie.original_language}`}</span>
+                              <span>{`Score: ${movie.popularity}`}</span>
+                            </TInfo>
+                          </TInfos>
+                        </TBox>
                       ))}
-                  </Row>
-                </AnimatePresence>
-              </DisplayStand>
-            </Slider>
-            <Slider style={{ marginTop: "500px" }}>
-              <StandTitles>
-                <StandTitle>Top Rated</StandTitle>
-                <AddIndexBtn onClick={() => changeTopRatedIndex(true)}>
-                  ≫
-                </AddIndexBtn>
-                <SubtractIndexBtn onClick={() => changeTopRatedIndex(false)}>
-                  ≪
-                </SubtractIndexBtn>
-              </StandTitles>
-              <DisplayStand>
-                <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                  <Row
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ type: "tween", duration: 1 }}
-                    key={topRatedIndex}
-                  >
-                    {topRated.results
-                      .slice(
-                        offset * topRatedIndex,
-                        offset * topRatedIndex + offset
-                      )
-                      .map((movie) => (
-                        <Box
+                    </Display>
+                  </AnimatePresence>
+                </div>
+              </Slider>
+              <Slider>
+                <StandTitles>
+                  <StandTitle>Top Rated</StandTitle>
+                </StandTitles>
+                <div>
+                  <AnimatePresence>
+                    <Display>
+                      {topRated.results.slice(0, 18).map((movie) => (
+                        <TBox
                           layoutId={movie.id + "topRated"}
                           key={movie.id}
                           variants={boxVariants}
@@ -371,111 +279,109 @@ export default function Movies() {
                           bgphoto={makeImagePath(movie.backdrop_path)}
                           onClick={() => onBoxClicked("topRated", movie.id)}
                         >
-                          <Info variants={infoVariants}>
-                            <InfoBtns>
-                              <InfoLeftBtns>
-                                <InfoBtn>▶</InfoBtn>
-                                <InfoBtn>+</InfoBtn>
-                                <InfoBtn>👍🏻</InfoBtn>
-                              </InfoLeftBtns>
-                              <InfoBtn>∨</InfoBtn>
-                            </InfoBtns>
-                            <InfoSentences>
-                              <InfoTitle>{movie.title}</InfoTitle>
-                              <InfoGenres>
-                                {movie.genre_ids.slice(0, 3).map((genreId) => (
-                                  <InfoGenre key={genreId}>
-                                    {`● ${getMovieGenre(genreId)}`}
-                                  </InfoGenre>
-                                ))}
-                              </InfoGenres>
-                            </InfoSentences>
-                          </Info>
-                        </Box>
-                      ))}
-                  </Row>
-                </AnimatePresence>
-              </DisplayStand>
-            </Slider>
-            {bigMovieMatch ? (
-              <>
-                <Overlay onClick={onOverlayClick} />
-                <BigMovie
-                  style={{ top: scrollY.get() + 20 }}
-                  layoutId={bigMovieMatch.params.movieId + clickedMovieType}
-                >
-                  {clickedMovie ? (
-                    <>
-                      <BigCover
-                        style={{
-                          backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedMovie.backdrop_path,
-                            "w500"
-                          )})`,
-                        }}
-                      />
-                      <BigAllInfos>
-                        <BigSentenceInfos>
-                          <BigMainInfos>
-                            <BigMediaTitle
-                              titleLength={clickedMovie.title.length}
-                              style={{ fontWeight: "bold" }}
-                            >
-                              {clickedMovie.title}
-                            </BigMediaTitle>
-                            <p
+                          <TInfos variants={infoVariants}>
+                            <TInfo
                               style={{
+                                width: "50%",
                                 fontSize: "15px",
-                                fontWeight: "300",
+                                fontWeight: "bold",
                               }}
                             >
-                              {clickedMovie.overview.length > 300
-                                ? clickedMovie.overview.slice(0, 300) + "..."
-                                : clickedMovie.overview}
-                            </p>
-                          </BigMainInfos>
-                          <BigOtherInfos>
-                            {clickedMovie.genre_ids.map((genreId) => (
-                              <BigOtherInfo key={genreId}>
-                                {`● ${getMovieGenre(genreId)}`}
+                              {movie.title}
+                            </TInfo>
+                            <TInfo style={{ width: "30%" }}>
+                              <span>{`🏳️: ${movie.original_language}`}</span>
+                              <span>{`Score: ${movie.popularity}`}</span>
+                            </TInfo>
+                          </TInfos>
+                        </TBox>
+                      ))}
+                    </Display>
+                  </AnimatePresence>
+                </div>
+              </Slider>
+              {bigMovieMatch ? (
+                <>
+                  <Overlay onClick={onOverlayClick} />
+                  <BigMovie
+                    style={{ top: scrollY.get() + 20 }}
+                    layoutId={bigMovieMatch.params.movieId + clickedMovieType}
+                  >
+                    {clickedMovie ? (
+                      <>
+                        <BigCover
+                          style={{
+                            backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
+                              clickedMovie.backdrop_path,
+                              "w500"
+                            )})`,
+                          }}
+                        />
+                        <BigAllInfos>
+                          <BigSentenceInfos>
+                            <BigMainInfos>
+                              <BigMediaTitle
+                                titleLength={clickedMovie.title.length}
+                                style={{ fontWeight: "bold" }}
+                              >
+                                {clickedMovie.title}
+                              </BigMediaTitle>
+                              <p
+                                style={{
+                                  fontSize: "15px",
+                                  fontWeight: "300",
+                                }}
+                              >
+                                {clickedMovie.overview.length > 300
+                                  ? clickedMovie.overview.slice(0, 300) + "..."
+                                  : clickedMovie.overview}
+                              </p>
+                            </BigMainInfos>
+                            <BigOtherInfos>
+                              {clickedMovie.genre_ids.map((genreId) => (
+                                <BigOtherInfo key={genreId}>
+                                  {`● ${getMovieGenre(genreId)}`}
+                                </BigOtherInfo>
+                              ))}
+                              <BigOtherInfo>
+                                {`Release Date: ${clickedMovie.release_date}`}
                               </BigOtherInfo>
-                            ))}
-                            <BigOtherInfo>
-                              {`Release Date: ${clickedMovie.release_date}`}
-                            </BigOtherInfo>
-                            <BigOtherInfo>
-                              {`Popularity: ${clickedMovie.popularity}`}
-                            </BigOtherInfo>
-                            <BigOtherInfo>
-                              {`Vote Average: ${clickedMovie.vote_average}`}
-                            </BigOtherInfo>
-                          </BigOtherInfos>
-                        </BigSentenceInfos>
-                        <SimilarTitle>Similar Movies</SimilarTitle>
-                        <SimilarMovies>
-                          {similarLoading ? (
-                            <p>아직은 보여줄 수 없다</p>
-                          ) : (
-                            <>
-                              {similar.results
-                                ? similar.results
-                                    .slice(0, 6)
-                                    .map((s) => (
-                                      <SimilarMovie
-                                        key={s.id}
-                                        bgphoto={makeImagePath(s.backdrop_path)}
-                                      />
-                                    ))
-                                : null}
-                            </>
-                          )}
-                        </SimilarMovies>
-                      </BigAllInfos>
-                    </>
-                  ) : null}
-                </BigMovie>
-              </>
-            ) : null}
+                              <BigOtherInfo>
+                                {`Popularity: ${clickedMovie.popularity}`}
+                              </BigOtherInfo>
+                              <BigOtherInfo>
+                                {`Vote Average: ${clickedMovie.vote_average}`}
+                              </BigOtherInfo>
+                            </BigOtherInfos>
+                          </BigSentenceInfos>
+                          <SimilarTitle>Similar Movies</SimilarTitle>
+                          <SimilarMovies>
+                            {similarLoading ? (
+                              <p>아직은 보여줄 수 없다</p>
+                            ) : (
+                              <>
+                                {similar.results
+                                  ? similar.results
+                                      .slice(0, 6)
+                                      .map((s) => (
+                                        <SimilarMovie
+                                          key={s.id}
+                                          bgphoto={makeImagePath(
+                                            s.backdrop_path
+                                          )}
+                                        />
+                                      ))
+                                  : null}
+                              </>
+                            )}
+                          </SimilarMovies>
+                        </BigAllInfos>
+                      </>
+                    ) : null}
+                  </BigMovie>
+                </>
+              ) : null} */}
+            </>
           </>
         </>
       )}

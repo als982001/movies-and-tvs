@@ -83,10 +83,15 @@ export const TBox = styled(motion.div)<{ bgphoto: string }>`
   border-radius: 20px;
 
   box-shadow: 3px 3px 2px 1px #d8d8d8, -3px 3px 2px 1px #d8d8d8;
-  &:first-child {
+  &:first-child,
+  &:nth-child(7),
+  &:nth-child(13) {
     transform-origin: center left;
   }
-  &:last-child {
+
+  &:last-child,
+  &:nth-child(6),
+  &:nth-child(12) {
     transform-origin: center right;
   }
   cursor: pointer;
@@ -139,42 +144,6 @@ export default function Tvs() {
     ["tvs", "topRated"],
     getTopRatedTvs
   );
-
-  const [airingTodayIndex, setAiringTodayIndex] = useState(0);
-  const changeAiringTodayIndex = (plusIndex: boolean) => {
-    if (airingToday) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalTvs = airingToday.results.length - 1;
-      const maxIndex = Math.floor(totalTvs / offset) - 1;
-
-      if (plusIndex === true) {
-        setAiringTodayIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setAiringTodayIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
-
-  const [topRatedIndex, setTopRatedIndex] = useState(0);
-  const changeTopRatedIndex = (plusIndex: boolean) => {
-    if (topRated) {
-      if (leaving) return;
-
-      toggleLeaving();
-
-      const totalMovies = topRated.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-
-      if (plusIndex === true) {
-        setTopRatedIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      } else {
-        setTopRatedIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      }
-    }
-  };
 
   const bigTvMatch = useRouteMatch<{ tvId: string }>("/tvs/:tvId");
 
