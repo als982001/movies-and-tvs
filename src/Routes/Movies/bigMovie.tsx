@@ -46,7 +46,6 @@ export default function ClickedBigMovie({
   movieType,
   clickedMovie,
 }: IBigMovie) {
-  console.log("Movie Type = ", movieType);
   const history = useHistory();
   const { scrollY } = useViewportScroll();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");

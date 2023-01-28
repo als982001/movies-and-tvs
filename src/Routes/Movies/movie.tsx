@@ -1,10 +1,15 @@
-import { click } from "@testing-library/user-event/dist/click";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
-import { getNowPlayingMovies, IGetMovieResult, IMovie } from "../../api";
+import {
+  getTopRatedMovies,
+  getUpcomingMovies,
+  getNowPlayingMovies,
+  IGetMovieResult,
+  IMovie,
+} from "../../api";
 import {
   Display,
   Loader,
@@ -91,11 +96,19 @@ export const TInfo = styled.div`
   }
 `;
 
-export default function NowPlaying() {
+interface IMovieType {
+  movieType: string;
+}
+
+export default function Movie({ movieType }: IMovieType) {
   const history = useHistory();
   const { data, isLoading } = useQuery<IGetMovieResult>(
-    "nowPlaying",
-    getNowPlayingMovies
+    movieType,
+    movieType === "nowPlaying"
+      ? getNowPlayingMovies
+      : movieType === "topRated"
+      ? getTopRatedMovies
+      : getUpcomingMovies
   );
   const [clickedMovie, setClickedMovie] = useState<IMovie>(emptyMovie);
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
@@ -109,7 +122,13 @@ export default function NowPlaying() {
     <>
       <Slider>
         <StandTitles>
-          <StandTitle>Now Playing</StandTitle>
+          <StandTitle>
+            {movieType === "nowPlaying"
+              ? "Now Playing"
+              : movieType === "topRated"
+              ? "Top Rated"
+              : "Upcoming"}
+          </StandTitle>
         </StandTitles>
         {isLoading ? (
           <Loader>Loading,,,</Loader>
@@ -122,7 +141,7 @@ export default function NowPlaying() {
                   .slice(0, 18)
                   .map((movie) => (
                     <TBox
-                      layoutId={movie.id + "nowPlaying"}
+                      layoutId={movie.id + movieType}
                       key={movie.id}
                       variants={boxVariants}
                       initial="normal"
@@ -153,8 +172,8 @@ export default function NowPlaying() {
           </div>
         )}
       </Slider>
-      {bigMovieMatch ? (
-        <ClickedBigMovie clickedMovie={clickedMovie} movieType={"nowPlaying"} />
+      {bigMovieMatch && Number(clickedMovie.id) > 0 ? (
+        <ClickedBigMovie clickedMovie={clickedMovie} movieType={movieType} />
       ) : null}
     </>
   );
