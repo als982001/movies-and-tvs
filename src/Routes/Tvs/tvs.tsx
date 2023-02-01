@@ -1,195 +1,55 @@
 import { useQuery } from "react-query";
-import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
-import { useEffect, useState } from "react";
-import {
-  getOnAirTvs,
-  getTopRatedTvs,
-  ITv,
-  IGetTvResult,
-  getPopularTvs,
-  API_KEY,
-  getAiringTodayTvs,
-} from "../../api";
-import {
-  AddIndexBtn,
-  Banner,
-  BigAllInfos,
-  BigCover,
-  BigMainInfos,
-  BigMediaTitle,
-  BigMovie,
-  BigOtherInfo,
-  BigOtherInfos,
-  BigSentenceInfos,
-  Box,
-  Display,
-  DisplayStand,
-  Info,
-  InfoBtn,
-  InfoBtns,
-  InfoGenre,
-  InfoGenres,
-  InfoLeftBtns,
-  InfoSentences,
-  InfoTitle,
-  Loader,
-  Overlay,
-  Overview,
-  Row,
-  SimilarMovie,
-  SimilarMovies,
-  SimilarTitle,
-  Slider,
-  StandTitle,
-  StandTitles,
-  SubtractIndexBtn,
-  Title,
-  Wrapper,
-} from "../../Components/Styles/mediaStyles";
+import { getOnAirTvs, IGetTvResult } from "../../api";
 import { makeImagePath } from "../../utils";
-import {
-  boxVariants,
-  infoVariants,
-  rowVariants,
-} from "../../Components/Variants/mediaVariants";
-import { tvGenres, getTvGenre } from "../../Components/genres";
-import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
+import Tv from "./tv";
 
-const offset = 6;
-
-const emptyTv: ITv = {
-  poster_path: "",
-  popularity: 0,
-  id: 0,
-  backdrop_path: "",
-  vote_average: 0,
-  overview: "",
-  first_air_date: "",
-  origin_country: [""],
-  genre_ids: [0],
-  original_language: "",
-  vote_count: 0,
-  name: "",
-  original_name: "",
-};
-
-export const TBox = styled(motion.div)<{ bgphoto: string }>`
-  background-color: white;
-  background-image: url(${(props) => props.bgphoto});
-  background-size: cover;
-  background-position: center;
-  height: 200px;
-  border-radius: 20px;
-
-  box-shadow: 3px 3px 2px 1px #d8d8d8, -3px 3px 2px 1px #d8d8d8;
-  &:first-child,
-  &:nth-child(7),
-  &:nth-child(13) {
-    transform-origin: center left;
-  }
-
-  &:last-child,
-  &:nth-child(6),
-  &:nth-child(12) {
-    transform-origin: center right;
-  }
-  cursor: pointer;
+const Wrapper = styled.div`
+  background: black;
+  padding-bottom: 200px;
 `;
 
-export const TInfos = styled(motion.section)`
-  background-color: ${(props) => props.theme.black.lighter};
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  height: 35%;
-  bottom: 0;
-  border-radius: 0 0 20px 20px;
+const Overview = styled.p`
+  font-size: 30px;
+  width: 50%;
+`;
 
+const Title = styled.h2`
+  font-size: 68px;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
+const Loader = styled.div`
+  height: 20vh;
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-around;
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 50px;
 `;
 
-export const TInfo = styled.div`
-  height: 80%;
+const Banner = styled.div<{ bgphoto: string }>`
+  height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: center;
-  border-radius: 20%;
-  font-weight: bold;
-  span {
-    font-size: 10px;
-  }
+  padding: 60px;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgphoto});
+  background-size: cover;
 `;
 
 export default function Tvs() {
-  const [clickedTv, setClickedTv] = useState<ITv>(emptyTv);
-  const [clickedTvType, setClickedTvType] = useState<string>("");
-
-  const { scrollY } = useViewportScroll();
-  const history = useHistory();
-  const toggleLeaving = () => setLeaving((prev) => !prev);
-
-  const [leaving, setLeaving] = useState(false);
-
   const { data: onAir, isLoading: onAirLoading } = useQuery<IGetTvResult>(
     ["tvs", "onAir"],
     getOnAirTvs
   );
-  const { data: airingToday, isLoading: airingTodayLoading } =
-    useQuery<IGetTvResult>(["tvs", "airingToday"], getAiringTodayTvs);
-  const { data: topRated, isLoading: topRatedLoading } = useQuery<IGetTvResult>(
-    ["tvs", "topRated"],
-    getTopRatedTvs
-  );
-
-  const bigTvMatch = useRouteMatch<{ tvId: string }>("/tvs/:tvId");
-
-  const onOverlayClick = () => {
-    setClickedTv((prev) => emptyTv);
-    setClickedTvType((prev) => "");
-    setSimilarLoading((prev) => true);
-    history.push("/tvs");
-  };
-  const onBoxClicked = (type: string, tvId: number) => {
-    let result = emptyTv;
-
-    if (type === "onAir") {
-      result = onAir.results.find((tv) => tv.id === tvId);
-    } else if (type === "airingToday") {
-      result = airingToday.results.find((tv) => tv.id === tvId);
-    } else if (type === "topRated") {
-      result = topRated.results.find((tv) => tv.id === tvId);
-    }
-
-    setClickedTv(result);
-    setClickedTvType(type);
-
-    history.push(`/tvs/${tvId}`);
-  };
-
-  const [similar, setSimilar] = useState<IGetTvResult>();
-  const [similarLoading, setSimilarLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      if (clickedTv) {
-        const response = await fetch(
-          `https://api.themoviedb.org/3/tv/${clickedTv.id}/similar?api_key=${API_KEY}`
-        );
-        const json = await response.json();
-
-        setSimilar(json);
-        setSimilarLoading((prev) => false);
-      }
-    })();
-  }, [clickedTv]);
 
   return (
     <Wrapper>
-      {onAirLoading || airingTodayLoading || topRatedLoading ? (
+      {onAirLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
@@ -197,8 +57,11 @@ export default function Tvs() {
             <Title>{onAir.results[0].name}</Title>
             <Overview>{onAir.results[0].overview}</Overview>
           </Banner>
+          <Tv page="tvs" tvType="onAir" />
+          <Tv page="tvs" tvType="airingToday" />
+          <Tv page="tvs" tvType="topRated" />
           <>
-            <Slider>
+            {/* <Slider>
               <StandTitles>
                 <StandTitle>On Air</StandTitle>
               </StandTitles>
@@ -401,7 +264,7 @@ export default function Tvs() {
                   ) : null}
                 </BigMovie>
               </>
-            ) : null}
+            ) : null} */}
           </>
         </>
       )}

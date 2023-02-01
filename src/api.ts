@@ -1,7 +1,3 @@
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
-import { useLocation } from "react-router-dom";
-import { NumberLiteralType } from "typescript";
-
 export const API_KEY = "cb5ff8ff66f9c05c5e1f5fd2602e7603";
 const BASE_PATH = "https://api.themoviedb.org/3";
 export const YOUTUBE_PATH = "https://www.youtube.com/embed/";
@@ -135,39 +131,6 @@ export interface ISearchResult {
   total_results: number;
   total_pages: number;
 }
-
-export const emptyMovie: IMovie = {
-  poster_path: "",
-  adult: false,
-  overview: "",
-  release_date: "",
-  genre_ids: [0],
-  id: 0,
-  original_title: "",
-  original_language: "",
-  title: "",
-  backdrop_path: "",
-  popularity: 0,
-  vote_average: 0,
-  video: false,
-  vote_count: 0,
-};
-
-export const emptyTv: ITv = {
-  poster_path: "",
-  popularity: 0,
-  id: 0,
-  backdrop_path: "",
-  vote_average: 0,
-  overview: "",
-  first_air_date: "",
-  origin_country: [""],
-  genre_ids: [0],
-  original_language: "",
-  vote_count: 0,
-  name: "",
-  original_name: "",
-};
 
 export const getNowPlayingMovies = async () => {
   const response = await fetch(

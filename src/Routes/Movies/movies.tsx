@@ -1,109 +1,44 @@
 import { useQuery } from "react-query";
-import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useHistory, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
-import {
-  API_KEY,
-  getNowPlayingMovies,
-  getTopRatedMovies,
-  getUpcomingMovies,
-  IGetMovieResult,
-  IMovie,
-  emptyMovie,
-} from "../../api";
-import {
-  AddIndexBtn,
-  Banner,
-  BigAllInfos,
-  BigCover,
-  BigMainInfos,
-  BigMediaTitle,
-  BigMovie,
-  BigOtherInfo,
-  BigOtherInfos,
-  BigSentenceInfos,
-  Box,
-  Display,
-  DisplayStand,
-  Info,
-  InfoBtn,
-  InfoBtns,
-  InfoGenre,
-  InfoGenres,
-  InfoLeftBtns,
-  InfoSentences,
-  InfoTitle,
-  Loader,
-  Overlay,
-  Overview,
-  Row,
-  SimilarMovie,
-  SimilarMovies,
-  SimilarTitle,
-  Slider,
-  StandTitle,
-  StandTitles,
-  SubtractIndexBtn,
-  Title,
-  Wrapper,
-} from "../../Components/Styles/mediaStyles";
+import { getNowPlayingMovies, IGetMovieResult } from "../../api";
 import { makeImagePath } from "../../utils";
-import {
-  boxVariants,
-  infoVariants,
-} from "../../Components/Variants/mediaVariants";
-import { getMovieGenre } from "../../Components/genres";
 import Movie from "./movie";
 
-export const TBox = styled(motion.div)<{ bgphoto: string }>`
-  background-color: white;
-  background-image: url(${(props) => props.bgphoto});
-  background-size: cover;
-  background-position: center;
-  height: 200px;
-  border-radius: 20px;
-
-  box-shadow: 3px 3px 2px 1px #d8d8d8, -3px 3px 2px 1px #d8d8d8;
-  &:first-child,
-  &:nth-child(7),
-  &:nth-child(13) {
-    transform-origin: center left;
-  }
-
-  &:last-child,
-  &:nth-child(6),
-  &:nth-child(12) {
-    transform-origin: center right;
-  }
-  cursor: pointer;
+const Wrapper = styled.div`
+  background: black;
+  padding-bottom: 200px;
 `;
 
-export const TInfos = styled(motion.section)`
-  background-color: ${(props) => props.theme.black.lighter};
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  height: 35%;
-  bottom: 0;
-  border-radius: 0 0 20px 20px;
+const Overview = styled.p`
+  font-size: 30px;
+  width: 50%;
+`;
 
+const Title = styled.h2`
+  font-size: 68px;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
+const Loader = styled.div`
+  height: 20vh;
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-around;
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 50px;
 `;
 
-export const TInfo = styled.div`
-  height: 80%;
+const Banner = styled.div<{ bgphoto: string }>`
+  height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: center;
-  border-radius: 20%;
-  font-weight: bold;
-  span {
-    font-size: 10px;
-  }
+  padding: 60px;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgphoto});
+  background-size: cover;
 `;
 
 export default function Movies() {
@@ -123,9 +58,9 @@ export default function Movies() {
             <Overview>{nowPlaying.results[0].overview}</Overview>
           </Banner>
           <>
-            <Movie movieType={"nowPlaying"} />
-            <Movie movieType={"upcoming"} />
-            <Movie movieType={"topRated"} />
+            <Movie page={"movies"} movieType={"nowPlaying"} />
+            <Movie page={"movies"} movieType={"upcoming"} />
+            <Movie page={"movies"} movieType={"topRated"} />
             <>
               {/*  <Slider>
                 <StandTitles>

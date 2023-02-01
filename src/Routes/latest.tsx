@@ -1,15 +1,70 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { getLatestMovie, getLatestTv, ILatestMovie, ILatestTv } from "../api";
-import {
-  LatestMedia,
-  LatestMediaInfos,
-  LatestMediaPoster,
-  LatestNoPoster,
-  Loader,
-  Wrapper,
-} from "../Components/Styles/mediaStyles";
 import { makeImagePath } from "../utils";
+
+const Wrapper = styled.div`
+  background: black;
+  padding-bottom: 200px;
+`;
+
+const Loader = styled.div`
+  height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 50px;
+`;
+
+const LatestMedia = styled.section`
+  width: 80vw;
+  height: 80vh;
+  border-radius: 50px;
+  background-color: #282a3a;
+  margin-bottom: 100px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LatestNoPoster = styled.section`
+  width: 65%;
+  height: 90%;
+  background-color: #1a120b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  font-size: 100px;
+  font-weight: bold;
+`;
+
+const LatestMediaPoster = styled.section<{ bgphoto: string }>`
+  width: 65%;
+  height: 90%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgphoto});
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+`;
+
+const LatestMediaInfos = styled.section`
+  width: 25%;
+  height: 90%;
+  background-color: #d8d8d8;
+  border-radius: 20px;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: #182747;
+`;
 
 const Title = styled.p`
   font-size: 35px;

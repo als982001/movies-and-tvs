@@ -230,6 +230,7 @@ export const Overlay = styled(motion.div)`
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
+  z-index: 5;
 `;
 
 export const BigMovie = styled(motion.div)`
@@ -246,6 +247,7 @@ export const BigMovie = styled(motion.div)`
   display: flex;
   flex-direction: column;
   box-shadow: 5px 5px 20px 10px black;
+  z-index: 10;
 `;
 
 export const BigCover = styled.div`

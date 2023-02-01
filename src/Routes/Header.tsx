@@ -3,8 +3,6 @@ import { Link, useRouteMatch, useHistory } from "react-router-dom";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { getPopularTvs, IGetTvResult } from "../api";
-import { useQuery } from "react-query";
 
 const Nav = styled(motion.nav)`
   display: flex;

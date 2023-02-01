@@ -1,12 +1,63 @@
+import styled from "styled-components";
 import { Link } from "react-router-dom";
-import {
-  Introduction,
-  IntroductionOverview,
-  IntroductionTitle,
-  PageBtn,
-  Poster,
-  Wrapper,
-} from "../Components/Styles/homeStyles";
+
+const Wrapper = styled.div`
+  background-color: ${(props) => props.theme.black.darker};
+  width: 100vw;
+  height: 210vh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Poster = styled.section`
+  width: 100vw;
+  height: 70vh;
+  background-size: cover;
+  background-position: center center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const Introduction = styled.section`
+  width: 40%;
+  height: 80%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: rgba(73, 85, 121, 0.2);
+  border-radius: 20px;
+`;
+
+const IntroductionTitle = styled.h1`
+  font-size: 55px;
+  font-weight: bold;
+  color: #a4a4a4;
+  margin-bottom: 5px;
+`;
+
+const IntroductionOverview = styled.p`
+  font-size: 30px;
+  font-weight: 300;
+  color: #a4a4a4;
+`;
+
+const PageBtn = styled.div`
+  background-color: ${(props) => props.theme.black.lighter};
+  width: 30%;
+  height: 35%;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+
+  &:hover {
+    background-color: ${(props) => props.theme.black.darker};
+  }
+`;
 
 function Home() {
   return (

@@ -17,5 +17,10 @@
     "jsx": "react-jsx",
     "strictNullChecks": false
   },
-  "include": ["src", "테스트용/시험.js", "임시파일들/Tv.tsx"]
+  "include": [
+    "src",
+    "테스트용/시험.js",
+    "임시파일들/Tv.tsx",
+    "src/Components/Styles"
+  ]
 }

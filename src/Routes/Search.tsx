@@ -1,12 +1,7 @@
-import { AnimatePresence, useViewportScroll } from "framer-motion";
+import { useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import {
-  useHistory,
-  useLocation,
-  useParams,
-  useRouteMatch,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import {
@@ -18,30 +13,185 @@ import {
   API_KEY,
 } from "../api";
 import { makeImagePath } from "../utils";
-import {
-  infoVariants,
-  Loader,
-  Result,
-  Results,
-  resultVariants,
-  SmallInfo,
-  Wrapper,
-} from "../Components/Styles/searchStyles";
-import {
-  Overlay,
-  BigMovie,
-  BigCover,
-  BigAllInfos,
-  BigSentenceInfos,
-  BigMainInfos,
-  BigOtherInfos,
-  BigOtherInfo,
-  BigMediaTitle,
-  SimilarMovies,
-  SimilarTitle,
-  SimilarMovie,
-} from "../Components/Styles/mediaStyles";
 import { getMovieGenre, getTvGenre } from "../Components/genres";
+
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  z-index: 5;
+`;
+
+const BigMovie = styled(motion.div)`
+  position: absolute;
+  width: 50vw;
+  height: 150vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 15px;
+  border: 1px solid #f8ede3;
+  overflow: hidden;
+  background-color: ${(props) => props.theme.black.lighter};
+  display: flex;
+  flex-direction: column;
+  box-shadow: 5px 5px 20px 10px black;
+  z-index: 10;
+`;
+
+const BigCover = styled.div`
+  width: 100%;
+  flex: 4 0 0;
+  background-size: cover;
+  background-position: center center;
+`;
+
+const BigAllInfos = styled.section`
+  width: 100%;
+  flex: 6 0 0;
+  display: flex;
+  flex-direction: column;
+`;
+
+const BigSentenceInfos = styled.section`
+  width: 100%;
+  height: 40%;
+  display: flex;
+`;
+
+const BigMainInfos = styled.section`
+  width: 60%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-top: 0px;
+  justify-content: center;
+  padding: 0 10px;
+`;
+
+const BigOtherInfos = styled.section`
+  width: 40%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  padding-left: 20px;
+`;
+
+const BigOtherInfo = styled.span`
+  font-size: 15px;
+  margin: 1px 0;
+`;
+
+const SimilarMovies = styled.section`
+  width: 100%;
+  height: 60%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  position: relative;
+`;
+
+const SimilarTitle = styled.h2`
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0 auto;
+`;
+
+const SimilarMovie = styled.section<{ bgphoto: string }>`
+  border: 1px black solid;
+  border-radius: 10px;
+  background-image: url(${(props) => props.bgphoto});
+  background-size: cover;
+  background-position: center;
+`;
+
+const BigMediaTitle = styled.h1<{ titleLength: number }>`
+  fontweight: "bold";
+  font-size: ${(props) => (props.titleLength > 20 ? "25px" : "35px")};
+  margin-bottom: 5px;
+`;
+
+const Loader = styled.div`
+  font-size: 40px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Wrapper = styled.div`
+  padding-top: 100px;
+  padding-bottom: 200px;
+`;
+
+const Results = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 80vw;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+`;
+
+const Result = styled(motion.section)`
+  display: flex;
+  height: 70vh;
+  background-size: cover;
+  background-position: center center;
+  border-radius: 30px;
+  position: relative;
+`;
+
+const SmallInfo = styled(motion.section)`
+  width: 100%;
+  height: 20%;
+  position: absolute;
+  bottom: 0;
+  background-color: ${(props) => props.theme.black.lighter};
+  border-radius: 0 0 30px 30px;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  padding: 0 10px;
+`;
+
+const resultVariants = {
+  normal: {
+    scale: 1,
+  },
+  hover: {
+    opacity: 1,
+    scale: 1.3,
+    y: 0,
+    zIndex: 5,
+    transition: {
+      delay: 0.5,
+      duration: 0.1,
+      type: "tween",
+    },
+  },
+};
+
+const infoVariants = {
+  hover: {
+    opacity: 1,
+    transition: {
+      delay: 0.5,
+      duration: 0.1,
+      type: "tween",
+    },
+  },
+};
 
 const emptyMedia: ISearch = {
   backdrop_path: "",
