@@ -124,7 +124,6 @@ function Header() {
   const movieMatch = useRouteMatch("/movies");
   const tvMatch = useRouteMatch("/tvs");
   const latestMatch = useRouteMatch("/latest");
-  const popularMatch = useRouteMatch("/popular");
 
   const [searchOpen, setSearchOpen] = useState(false);
   const inputAnimation = useAnimation();
@@ -180,11 +179,6 @@ function Header() {
           <Item>
             <Link to="/tvs">
               Tv Shows {tvMatch && <Circle layoutId="circle" />}
-            </Link>
-          </Item>
-          <Item>
-            <Link to="/popular">
-              Popular {popularMatch && <Circle layoutId="circle" />}
             </Link>
           </Item>
           <Item>

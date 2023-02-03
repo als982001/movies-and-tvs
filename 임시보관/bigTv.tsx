@@ -1,7 +1,7 @@
 import { useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { ITv, IGetTvResult, API_KEY } from "../../api";
+import { ITv, IGetTvResult, API_KEY } from "../src/api";
 
 interface IBigTv {
   tvType: string;

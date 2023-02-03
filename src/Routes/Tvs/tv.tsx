@@ -259,6 +259,13 @@ const typeTitle = (type: string): string => {
   return null;
 };
 
+const getTvs = (type: string) => {
+  if (type === "onAir") return getOnAirTvs;
+  if (type === "topRated") return getTopRatedTvs;
+  if (type === "airingToday") return getAiringTodayTvs;
+  if (type === "popular") return getPopularTvs;
+};
+
 export default function Tv({ tvType, page }: ITvType) {
   const history = useHistory();
   const { scrollY } = useScroll();
@@ -268,6 +275,9 @@ export default function Tv({ tvType, page }: ITvType) {
   const [similar, setSimilar] = useState<IGetTvResult>();
   const [similarLoading, setSimilarLoading] = useState(true);
 
+  const { data, isLoading } = useQuery<IGetTvResult>(tvType, getTvs(tvType));
+
+  /*
   const { data, isLoading } = useQuery<IGetTvResult>(
     tvType,
     tvType === "onAir"
@@ -278,6 +288,7 @@ export default function Tv({ tvType, page }: ITvType) {
       ? getPopularTvs
       : getTopRatedTvs
   );
+  */
 
   const onBoxClick = (tv: ITv) => {
     setClickedTv(tv);

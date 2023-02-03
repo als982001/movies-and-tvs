@@ -212,6 +212,7 @@ const emptyMedia: ISearch = {
 
 function Search() {
   const [clickedMedia, setClickedMedia] = useState<ISearch>(emptyMedia);
+  const [changeLoading, setChangeLoading] = useState(false);
   const [similar, setSimilar] = useState<IGetMovieResult | IGetTvResult>();
   const [similarLoading, setSimilarLoading] = useState(true);
 
@@ -232,6 +233,15 @@ function Search() {
   };
 
   useEffect(() => {
+    console.log(`ketword = ${keyword}`);
+    setChangeLoading((prev) => true);
+  }, [keyword]);
+
+  useEffect(() => {
+    setChangeLoading((prev) => false);
+  }, [data]);
+
+  useEffect(() => {
     (async () => {
       const response =
         clickedMedia.media_type === "tv"
@@ -250,7 +260,7 @@ function Search() {
 
   return (
     <Wrapper>
-      {isLoading ? (
+      {isLoading || changeLoading ? (
         <Loader>Loading...</Loader>
       ) : data?.results.length === 0 ? (
         <Loader>Not Found</Loader>

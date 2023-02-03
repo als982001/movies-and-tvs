@@ -161,6 +161,8 @@ export function getUpcomingMovies() {
 }
 
 export const getPopularMovies = async () => {
+  console.log(`흑흑흑1!!!! ${BASE_PATH}/movie/popular?api_key=${API_KEY}`);
+
   const response = await fetch(`${BASE_PATH}/movie/popular?api_key=${API_KEY}`);
   const json = response.json();
 

@@ -260,6 +260,13 @@ const typeTitle = (type: string): string => {
   return null;
 };
 
+const getMovies = (type: string) => {
+  if (type === "nowPlaying") return getNowPlayingMovies;
+  if (type === "topRated") return getTopRatedMovies;
+  if (type === "upcoming") return getUpcomingMovies;
+  if (type === "popular") return getPopularMovies;
+};
+
 export default function Movie({ movieType, page }: IMovieType) {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
@@ -269,6 +276,7 @@ export default function Movie({ movieType, page }: IMovieType) {
   const [similar, setSimilar] = useState<IGetMovieResult>();
   const [similarLoading, setSimilarLoading] = useState(true);
 
+  /*
   const { data, isLoading } = useQuery<IGetMovieResult>(
     movieType,
     movieType === "nowPlaying"
@@ -278,6 +286,12 @@ export default function Movie({ movieType, page }: IMovieType) {
       : movieType === "popular"
       ? getPopularMovies
       : getUpcomingMovies
+  );
+  */
+
+  const { data, isLoading } = useQuery<IGetMovieResult>(
+    movieType,
+    getMovies(movieType)
   );
 
   const onBoxClick = (movie: IMovie) => {

@@ -60,6 +60,7 @@ export default function Movies() {
           <>
             <Movie page={"movies"} movieType={"nowPlaying"} />
             <Movie page={"movies"} movieType={"upcoming"} />
+            <Movie page={"movies"} movieType={"popular"} />
             <Movie page={"movies"} movieType={"topRated"} />
             <>
               {/*  <Slider>

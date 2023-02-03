@@ -59,6 +59,7 @@ export default function Tvs() {
           </Banner>
           <Tv page="tvs" tvType="onAir" />
           <Tv page="tvs" tvType="airingToday" />
+          <Tv page="tvs" tvType="popular" />
           <Tv page="tvs" tvType="topRated" />
           <>
             {/* <Slider>
